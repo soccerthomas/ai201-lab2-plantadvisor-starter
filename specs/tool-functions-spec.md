@@ -25,19 +25,17 @@ These two functions are the tools the agent can call. They retrieve structured d
 
 When the plant is **found**, return:
 ```python
-{"found": True, "plant": <the full plant dict from _plant_db>}
+{"found": True, "plant": }
 ```
 
 When the plant is **not found**, return:
 ```python
-{"found": False, "name": <normalized input>, "message": <helpful string>}
+{"found": False, "name": , "message": }
 ```
 
 ---
 
 ### Design Decisions
-
-*Complete the two blank fields below before writing code. The others are pre-filled for you.*
 
 ---
 
@@ -57,52 +55,38 @@ Search in this order: direct key → display name → aliases. Keys are the fast
 lookup (O(1) dict access), so check those first. Display names are the next most
 likely match for clean user input. Aliases are the broadest net, so they go last.
 
-```
-1. Direct key match: normalized in _plant_db
-2. Display name match: plant["display_name"].lower() == normalized
-3. Alias match: normalized in [alias.lower() for alias in plant["aliases"]]
-```
+Direct key match: normalized in _plant_db
+Display name match: plant["display_name"].lower() == normalized
+Alias match: normalized in [alias.lower() for alias in plant["aliases"]]
+
 
 ---
 
 #### Alias matching approach
-
-*Aliases are stored as a list of strings. How will you check if the normalized input matches any alias in the list? Write your approach in pseudocode or plain English.*
-
-```
-[your answer here]
-```
+Loop through every plant in the database. For each plant, lowercase every
+alias in its aliases list and check if the normalized input matches any of
+them. Return the plant as soon as a match is found.
 
 ---
 
 #### Not-found message
-
-*When a plant isn't found, the agent will read your message and use it to decide what to tell the user. Write the exact string you'll return — make it useful to the agent, not just to a human reading logs.*
-
-```
-[your answer here]
-```
+"No plant matching '{normalized}' was found in the database. Let the user
+know and offer general advice if possible."
 
 ---
 
 #### Implementation Notes
 
-*Fill this in after implementing and running the app.*
-
 **Test: does `"devil's ivy"` return the pothos entry?**
-```
-[yes / no — if no, describe what happened]
-```
+Yes
 
 **Test: does `"SNAKE PLANT"` return the snake plant entry?**
-```
-[yes / no — if no, describe what happened]
-```
+Yes — input normalization to lowercase handles the casing.
 
 **One edge case you discovered while implementing:**
-```
-[your answer here]
-```
+Aliases with inconsistent spacing or punctuation (e.g. "devil's ivy" vs
+"devils ivy") won't match unless the alias in plants.json is an exact
+lowercase match. The normalization only handles casing, not punctuation.
 
 ---
 
@@ -127,8 +111,6 @@ The full season dict from `_season_data`, plus one additional field:
 ---
 
 ### Design Decisions
-
-*This function is pre-implemented — read through these fields and the code before working on `lookup_plant`.*
 
 ---
 
@@ -179,16 +161,11 @@ The full season dict from `_season_data`, plus a `detected_season` boolean. Exam
 
 #### Implementation Notes
 
-*Fill this in after testing.*
-
 **Test: does calling with `season=None` return the correct season for the current month?**
-```
-Current month: [month]
-Expected season: [season]
-Returned season: [season]
-```
+Current month: June
+Expected season: summer
+Returned season: summer
 
 **Test: does calling with `season="winter"` return winter data regardless of the current month?**
-```
-[yes / no]
-```
+Yes
+

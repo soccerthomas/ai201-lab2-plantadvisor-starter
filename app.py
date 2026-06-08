@@ -21,7 +21,7 @@ EXAMPLE_QUESTIONS = [
     "My calathea has brown edges. Is it the humidity?",
     "What are some good low-light plants for my apartment?",
     "Why does my boston fern keep losing fronds?",
-    "How do I care for my string of pearls?",   # not in database — tests graceful degradation
+    "How do I care for my string of pearls?",
 ]
 
 
@@ -30,11 +30,15 @@ def chat(message: str, history: list) -> str:
     return run_agent(message, history)
 
 
-# ──────────────────────────────────────────────
-# UI
-# ──────────────────────────────────────────────
-
-with gr.Blocks(title="Plant Advisor") as demo:
+with gr.Blocks(
+    title="Plant Advisor",
+    theme=gr.themes.Default(
+        primary_hue="green",
+        secondary_hue="emerald",
+        neutral_hue="stone",
+        font=[gr.themes.GoogleFont("Inter"), "sans-serif"],
+    )
+) as demo:
 
     gr.Markdown(
         """
@@ -44,7 +48,6 @@ with gr.Blocks(title="Plant Advisor") as demo:
     )
 
     with gr.Row():
-        # Sidebar
         with gr.Column(scale=1, min_width=220):
             gr.Markdown("### 🪴 Plants in My Database")
             gr.Markdown(
@@ -58,7 +61,6 @@ with gr.Blocks(title="Plant Advisor") as demo:
                 "*mother-in-law's tongue*, *swiss cheese plant*)."
             )
 
-        # Chat
         with gr.Column(scale=3):
             chatbot = gr.ChatInterface(
                 fn=chat,
@@ -74,16 +76,8 @@ with gr.Blocks(title="Plant Advisor") as demo:
                     placeholder="e.g. How often should I water my monstera?",
                     show_label=False,
                     scale=7,
-                    submit_btn="Ask",
                 ),
             )
 
 if __name__ == "__main__":
-    demo.launch(
-        theme=gr.themes.Default(
-            primary_hue="green",
-            secondary_hue="emerald",
-            neutral_hue="stone",
-            font=[gr.themes.GoogleFont("Inter"), "sans-serif"],
-        )
-    )
+    demo.launch()

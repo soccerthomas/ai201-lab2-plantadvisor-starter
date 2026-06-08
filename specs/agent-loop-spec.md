@@ -118,46 +118,39 @@ for tool_call in assistant_message.tool_calls:
 ---
 
 ### Loop termination conditions
-
-*The loop should stop when: (a) the LLM returns a response with no tool calls, OR (b) the MAX_TOOL_ROUNDS limit is reached. Describe how you will detect each condition and what you will return in each case.*
-
-```
-[your answer here]
-```
+(a) No tool calls: after each LLM call I check if assistant_message.tool_calls
+is falsy. If it is, the LLM is done calling tools and has a final answer,
+so I return assistant_message.content right there inside the loop.
+(b) MAX_TOOL_ROUNDS hit: the for loop only runs MAX_TOOL_ROUNDS times max.
+If the LLM keeps requesting tools and never gives a final answer, the
+loop just ends and I return a fallback string so the user gets something
+instead of an empty response or a crash.
 
 ---
 
 ### Extracting the final text response
-
-*Once the loop exits because there are no more tool calls, how do you extract the text content from the response object? What field holds the string you should return?*
-
-```
-[your answer here]
-```
+The final text lives in response.choices[0].message.content — I store that
+as assistant_message so I can just return assistant_message.content once
+I confirm there are no tool_calls on it.
 
 ---
 
 ## Implementation Notes
 
-*Fill this in after implementing and testing.*
-
 **Trace of a working agent turn (what tools were called and in what order):**
-
-```
-Query: "How should I care for my calathea?"
-Round 1 tool call: [tool name, args]
-Round 2 tool call: [tool name, args] (if any)
-Final response: [brief description]
-```
+Query: "How often should I water my snake plant in winter?"
+Round 1 tool call: lookup_plant({"plant_name": "snake plant"})
+Round 2 tool call: get_seasonal_conditions({"season": "winter"})
+Final response: Got back the snake plant care data and winter seasonal
+tips, then the LLM combined both into a specific watering recommendation.
 
 **What happens when you ask about a plant that isn't in the database?**
-
-```
-[describe the behavior you observed]
-```
+lookup_plant comes back with found: False. The agent lets the user know
+it couldn't find that plant and tries to give general advice based on
+what was described. It doesn't crash or return nothing.
 
 **One thing about the tool call API that surprised you:**
-
-```
-[your answer here]
-```
+You have to append the assistant message to the messages list BEFORE adding
+the tool results, even when the assistant message has no actual text in it.
+Felt weird to append a basically empty message but the API needs it to match
+the tool results back to the right tool calls.
